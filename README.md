@@ -1,5 +1,8 @@
 This GitHub repository houses code and input data used in the analyses detailed in the manuscript ***Metagenomics of Parkinson’s disease implicates the gut microbiome in multiple disease mechanisms***.
 
+Code for the most recent release is archived at Zenodo.
+[![DOI](https://zenodo.org/badge/497096789.svg)](https://zenodo.org/badge/latestdoi/497096789)
+
 The following README gives an overview of the overall structure of the repository and important notes about its contents.
 
 ## Directory tree for repository
