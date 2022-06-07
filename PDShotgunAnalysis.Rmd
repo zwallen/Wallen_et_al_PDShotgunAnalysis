@@ -289,6 +289,7 @@ suppress(library(ggfortify))
 suppress(library(gridExtra))
 suppress(library(vegan))
 suppress(library(pairwiseCI))
+suppress(library(vcd))
 suppress(library(readxl))
 suppress(library(phyloseq))
 suppress(library(car))
@@ -315,6 +316,7 @@ R packages and versions:
 '\ngridExtra -', paste(packageVersion("gridExtra")),
 '\nvegan -', paste(packageVersion("vegan")),
 '\npairwiseCI -', paste(packageVersion("pairwiseCI")),
+'\nvcd -', paste(packageVersion("vcd")),
 '\nreadxl -', paste(packageVersion("readxl")),
 '\nphyloseq -', paste(packageVersion("phyloseq")),
 '\ncar -', paste(packageVersion("car")),
@@ -2669,6 +2671,90 @@ saveWorkbook(wb, 'output/2.Gut_microbiome_composition/PERMANOVA_results.xlsx', o
 kable(results, col.names = colnames(results),
       row.names=F, align='c', caption = 'PERMANOVA results for PD vs NHC adjusted for sequence depth and collection method') %>%
   kable_styling(font_size=11, bootstrap_options=c("condensed", "responsive")) %>% scroll_box(height='200px', width='500')
+```
+
+### Testing differences in enterotypes between PD and NHC
+
+To determine if PD patients had a different distribution of enterotype frequencies than NHC, enterotype profiling was performed using the web-based EMBL enterotype classifier (http://enterotypes.org/), then differences in enterotype frequencies between PD and NHC tested using the `chisq.test` function to perform Pearson's Chi-squared test. The enterotype classifier uses the orignal entertoype definitions, classifying each sample as the enterotype *Bacteroides*, *Firmicutes*, or *Prevotella*.
+
+* To perform enterotype profiling, the MetaPhlAn relative abundance file was subsetted for only genus level entries, then uploaded to the web-based EMBL enterotype classifier. The raw results were downloaded and used to perform the Chi-squared test, and generate the mosaic plot. The Chi-squred results can be found in the file **2.Gut_microbiome_composition/Enterotype_chisq_results.xlsx**, and mosaic plot found in the file **2.Gut_microbiome_composition/Enterotype_mosaic_plot.pdf**. These results are reported in the manuscript text and in **Supplementary Fig. 2b**.
+
+```{r entertoypes, echo=T}
+# read in enterotype profiles
+et <- read.table('input/enterotypes.txt', header=T)
+
+# make a quick column for case status
+et$case_status <- NA
+et$case_status[grep('P', rownames(et))] <- "PD"
+et$case_status[grep('C', rownames(et))] <- "NHC"
+
+# perform chi-squared test
+chisq.res <- chisq.test(table(et$case_status, et$ET))
+
+# print results
+results <- data.frame()
+results <- data.frame(`Case status`=c(rownames(table(et$case_status, et$ET))[2], rownames(table(et$case_status, et$ET))[1]),
+                      Bacteroides=c(paste(table(et$case_status, et$ET)[2,1],' (',
+                                          round(table(et$case_status, et$ET)[2,1]/sum(table(et$case_status, et$ET)[2,])*100,0),'%)',
+                                          sep=''),
+                                    paste(table(et$case_status, et$ET)[1,1],' (',
+                                          round(table(et$case_status, et$ET)[1,1]/sum(table(et$case_status, et$ET)[1,])*100,0),'%)',
+                                          sep='')),
+                      Firmicutes=c(paste(table(et$case_status, et$ET)[2,2],' (',
+                                         round(table(et$case_status, et$ET)[2,2]/sum(table(et$case_status, et$ET)[2,])*100,0),'%)',
+                                         sep=''),
+                                   paste(table(et$case_status, et$ET)[1,2],' (',
+                                         round(table(et$case_status, et$ET)[1,2]/sum(table(et$case_status, et$ET)[1,])*100,0),'%)',
+                                         sep='')),
+                      Prevotella=c(paste(table(et$case_status, et$ET)[2,3],' (',
+                                         round(table(et$case_status, et$ET)[2,3]/sum(table(et$case_status, et$ET)[2,])*100,0),'%)',
+                                         sep=''),
+                                   paste(table(et$case_status, et$ET)[1,3],' (',
+                                         round(table(et$case_status, et$ET)[1,3]/sum(table(et$case_status, et$ET)[1,])*100,0),'%)',
+                                         sep='')),
+                      `Chi-squared results`=c('',
+                                              paste('X2=',round(chisq.res$statistic,1),
+                                                    ', P=',formatC(chisq.res$p.value,format='e',digits=0),
+                                                    sep='')),
+                      check.names=F)
+wb <- createWorkbook()
+
+addWorksheet(wb, 'Chi-squared results')
+writeData(wb, 'Chi-squared results', results, keepNA=T)
+setColWidths(wb, 'Chi-squared results', cols=1:ncol(results), widths=c(rep(15,4),20)) ### format cells
+addStyle(wb, 'Chi-squared results', cols=1:ncol(results), rows=1:(nrow(results)+1), gridExpand=T, style=center, stack=T)
+addStyle(wb, 'Chi-squared results', cols=1:ncol(results), rows=1, style=bold, stack=T) ### font
+addStyle(wb, 'Chi-squared results', cols=1:ncol(results), rows=c(1,2,(nrow(results)+2)), ### borders
+         gridExpand=T, style=horizontal_border_med, stack=T)
+
+saveWorkbook(wb, 'output/2.Gut_microbiome_composition/Enterotype_chisq_results.xlsx', overwrite=T) ### write out
+
+# print table
+kable(results, col.names = colnames(results),
+      row.names=F, align='c', caption = 'Chi-squared results for differences in enterotype distribution') %>%
+  kable_styling(font_size=11, bootstrap_options=c("condensed", "responsive")) %>% scroll_box(height='200px', width='500')
+
+# create mosaic plot
+pdf('output/2.Gut_microbiome_composition/Enterotype_mosaic_plot.pdf', height=3, width=10)
+counts <- table(dplyr::recode(et$case_status, PD=1L, NHC=2L), et$ET)
+rownames(counts) <- c("PD", "NHC")
+colnames(counts) <- c("Bacteroides","Firmicutes","Prevotella")
+dimnames(counts) <- list(`Case status`=c("PD", "NHC"),
+                         `Enterotype`=c("Bacteroides", "Firmicutes", "Prevotella"))
+percents <- rbind(paste(round(table(et$case_status, et$ET)[2,]/sum(table(et$case_status, et$ET)[2,])*100,0),'%',sep=''),
+                  paste(round(table(et$case_status, et$ET)[1,]/sum(table(et$case_status, et$ET)[1,])*100,0),'%',sep=''))
+rownames(percents) <- c("PD", "NHC")
+colnames(percents) <- c("Bacteroides","Firmicutes","Prevotella")
+dimnames(percents) <- list(`Case status`=c("PD", "NHC"),
+                           `Enterotype`=c("Bacteroides", "Firmicutes", "Prevotella"))
+mosaic(counts, main=NULL, highlighting='Enterotype', highlighting_fill=c('grey50','dodgerblue3','firebrick'),
+       spacing=spacing_equal(sp=0.5), labeling=labeling_border(varname=FALSE, rot_labels=0), keep_aspect_ratio=FALSE, pop=FALSE)
+  labeling_cells(text=percents, gp_text=gpar(col='white'), margin=0)(counts)
+trash <- dev.off()
+
+mosaic(counts, main=NULL, highlighting='Enterotype', highlighting_fill=c('grey50','dodgerblue3','firebrick'),
+       spacing=spacing_equal(sp=0.5), labeling=labeling_border(varname=FALSE, rot_labels=0), keep_aspect_ratio=FALSE, pop=FALSE)
+  labeling_cells(text=percents, gp_text=gpar(col='white'), margin=0)(counts)
 ```
 
 ### Differential abundance analysis of species and genera for PD vs NHC

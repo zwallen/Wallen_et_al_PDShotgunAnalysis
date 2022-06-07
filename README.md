@@ -1,8 +1,5 @@
 This GitHub repository houses code and input data used in the analyses detailed in the manuscript ***Metagenomics of Parkinson’s disease implicates the gut microbiome in multiple disease mechanisms***.
 
-Code for the most recent release is archived at Zenodo.
-[![DOI](https://zenodo.org/badge/497096789.svg)](https://zenodo.org/badge/latestdoi/497096789)
-
 The following README gives an overview of the overall structure of the repository and important notes about its contents.
 
 ## Directory tree for repository
@@ -28,6 +25,7 @@ Wallen_et_al_PDShotgunAnalysis
 |             --> count profiles of MetaPhlAn detected clades for PD and NHC samples
 |             --> count profiles of HUMAnN detected KO groups for PD and NHC samples
 |             --> count profiles of HUMAnN detected metabolic pathways for PD and NHC samples
+|             --> enterotype profiles for PD and NHC samples
 |             --> subject metadata
 |             --> read counts remaining after each step of sequence QC
 |
@@ -47,6 +45,8 @@ Wallen_et_al_PDShotgunAnalysis
     |       contains the following data:
     |        --> principal component analysis of PD and NHC samples using Aitchison distances
     |        --> PERMANOVA results for PD vs NHC using Aitchison distances
+    |        --> chi-squared results for differences in enterotype distribution b/t PD and NHC
+    |        --> mosaic plot showing distribution of enterotypes in PD and NHC
     |
     |-- 3.Taxonomic_associations
     |       contains the following data:
