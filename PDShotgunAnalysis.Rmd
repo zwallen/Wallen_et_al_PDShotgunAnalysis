@@ -2679,7 +2679,7 @@ To determine if PD patients had a different distribution of enterotype frequenci
 
 * To perform enterotype profiling, the MetaPhlAn relative abundance file was subsetted for only genus level entries, then uploaded to the web-based EMBL enterotype classifier. The raw results were downloaded and used to perform the Chi-squared test, and generate the mosaic plot. The Chi-squred results can be found in the file **2.Gut_microbiome_composition/Enterotype_chisq_results.xlsx**, and mosaic plot found in the file **2.Gut_microbiome_composition/Enterotype_mosaic_plot.pdf**. These results are reported in the manuscript text and in **Supplementary Fig. 2b**.
 
-```{r entertoypes, echo=T}
+```{r entertoypes, echo=T, fig.width=10, fig.height=3}
 # read in enterotype profiles
 et <- read.table('input/enterotypes.txt', header=T)
 
