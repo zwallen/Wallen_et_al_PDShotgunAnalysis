@@ -1,4 +1,8 @@
-This GitHub repository houses code and input data used in the statistical analyses reported in the manuscript ***Metagenomics of Parkinson’s disease implicates the gut microbiome in multiple disease mechanisms***.
+This GitHub repository houses code and input data used in the statistical analyses reported in the following manuscript:
+
+Zachary D Wallen, Ayse Demirkan, Guy Twa, Gwendolyn Cohen, Marissa N Dean, David G Standaert, Timothy Sampson, Haydeh Payami
+[***Metagenomics of Parkinson’s disease implicates the gut microbiome in multiple disease mechanisms***](https://www.biorxiv.org/content/10.1101/2022.06.08.495316v1)
+bioRxiv 2022.06.08.495316; doi: https://doi.org/10.1101/2022.06.08.495316
 
 The most current release of this repository is archived at Zenodo: [![DOI](https://zenodo.org/badge/497096789.svg)](https://zenodo.org/badge/latestdoi/497096789)
 
