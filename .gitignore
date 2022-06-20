@@ -4,3 +4,11 @@ Unused_code_chunks.Rmd
 render.err
 render.out
 PDShotgunAnalysis.log
+/environment
+/input
+LICENSE
+/output
+PDShotgunAnalysis.nb.html
+PDShotgunAnalysis.Rmd
+render.job
+render.R
